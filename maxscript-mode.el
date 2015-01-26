@@ -28,9 +28,11 @@
 
 (require 'regexp-opt)
 
-(defgroup maxscript-mode nil
-  "Major mode for editing Maxscript script files."
-  :group 'programming)
+;(defgroup maxscript-mode nil
+;  "Major mode for editing Maxscript script files."
+					;  :group 'programming)
+(define-derived-mode maxscript-mode fundamental-mode "MaxScript"
+  "Major mode for editing Maxscript script files.")
 
 (defcustom maxscript-mode-hook nil
   "*List of hook functions run by `maxscript-mode' (see `run-hooks')"
@@ -44,9 +46,10 @@
 (defvar maxscript-mode-map nil
   "Keymap used in Maxscript mode buffers.")
 
-(if maxscript-mode-map
+(if (boundp 'maxscript-mode-map)
     ()
   (setq maxscript-mode-map (make-sparse-keymap))
+  ;(set-keymap-parent maxscript-mode-map c++-mode-map)
   (define-key maxscript-mode-map ")" 'maxscript-mode-electric-insert-close-brace)
   ;;  (define-key maxscript-mode-map "\C-c\C-d" 'maxscript-run-script)
   )
@@ -190,12 +193,16 @@
 (defun maxscript-mode ()
   "Major mode for editing Maxscript script files."
   (interactive)
-  (kill-all-local-variables)
+  ;(kill-all-local-variables)
   (use-local-map maxscript-mode-map)
   (setq local-abbrev-table maxscript-mode-abbrev-table)
 
   (make-local-variable 'indent-line-function)
   (setq indent-line-function 'maxscript-indent-line)
+  (setq indent-tabs-mode t)
+  (setq tab-width 4) ; a tab is 4 spaces wide
+  (setq tab-stop-list '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60))
+  ;(local-set-key (kbd "C-m") 'newline-and-indent)
 
   (setq font-lock-defaults
         '((maxscript-font-lock-keywords)
@@ -205,7 +212,7 @@
           nil
           ))
 
-  (setq mode-name (concat "MAXScript"))
+  ;(setq mode-name (concat "MAXScript"))
   (setq major-mode 'maxscript-mode)
 
   (run-hooks 'maxscript-mode-hook)

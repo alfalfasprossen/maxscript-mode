@@ -1,24 +1,34 @@
 maxscript-mode
 ==============
 
-3dsmax script mode for Emacs.
+3DsMax script mode for Emacs.
 
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+Initial lisp file forked from 'akm'.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
+This mode provides syntax-highlighting and functionality to send a region (or the whole buffer) of maxscript or python code to a running 3DsMax to be executed directly.
 
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+To use it, put this in your init.el
+```lisp
+;; Maxscript mode for 3DsMax
+(add-to-list 'load-path "~/.emacs.d/lisp/maxscript-mode/")
+(autoload 'maxscript-mode "maxscript-mode" "maxscript-mode" t)
+(setq auto-mode-alist (append '(("\.ms$" . maxscript-mode)) auto-mode-alist))
 
- [Usage]
- 
-  (autoload 'maxscript-mode "maxscript-mode" "maxscript-mode" t)
-  (setq auto-mode-alist
-     (append '(("\\.ms$" . maxscript-mode)) auto-mode-alist))
+(add-hook
+ 'maxscript-mode-hook
+ (lambda ()
+   (require 'send-to-max)
+   (local-set-key (kbd "C-m C-r") 'maxscript-send-region)
+   (local-set-key (kbd "C-m C-e") 'maxscript-send-buffer)
+   (local-set-key (kbd "C-m C-c") 'maxscript-send-buffer)
+   (local-set-key (kbd "C-m C-d") 'maxscript-clear-listener)))
 
+(add-hook
+ 'python-mode-hook
+ (lambda ()
+   (require 'send-to-max)
+   (local-set-key (kbd "C-m C-r") 'maxscript-send-region-py)
+   (local-set-key (kbd "C-m C-e") 'maxscript-send-buffer-py)
+   (local-set-key (kbd "C-m C-c") 'maxscript-send-buffer-py)
+   (local-set-key (kbd "C-m C-d") 'maxscript-clear-listener)))
+```
