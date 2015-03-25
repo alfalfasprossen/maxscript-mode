@@ -2,9 +2,11 @@
 ;; -*- Mode:Emacs-Lisp -*-
 
 ;; Copyright (C) 2010 akm
+;; Copyright (C) 2015 Johannes Becker
 
-;; Author:  akm <akm.gfx@gmail.com>
-;; Version: 0.1
+;; Authors:  akm <akm.gfx@gmail.com>,
+;;           Johannes Becker <alfalfasprossen@gmail.com>
+;; Version: 0.2
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -26,64 +28,57 @@
 ;;     (append '(("\\.ms$" . maxscript-mode)) auto-mode-alist))
 ;;
 
+(eval-when-compile
+  (require 'cc-mode))
 (require 'regexp-opt)
 
-;(defgroup maxscript-mode nil
-;  "Major mode for editing Maxscript script files."
-					;  :group 'programming)
-(define-derived-mode maxscript-mode fundamental-mode "MaxScript"
-  "Major mode for editing Maxscript script files.")
+(defgroup maxscript nil
+  "Major mode for editing Maxscript script files."
+  :group 'languages)
 
 (defcustom maxscript-mode-hook nil
   "*List of hook functions run by `maxscript-mode' (see `run-hooks')"
   :type 'hook
-  :group 'maxscript-mode)
+  :group 'maxscript)
 
 (defvar maxscript-mode-abbrev-table nil
   "")
 (define-abbrev-table 'maxscript-mode-abbrev-table ())
 
-(defvar maxscript-mode-map nil
+(defvar maxscript-mode-map
+  (let ((maxscript-mode-map (make-sparse-keymap)))
+    (define-key maxscript-mode-map ")" 'maxscript-mode-electric-insert-close-brace)
+    (define-key maxscript-mode-map (kbd "C-m") 'newline-and-indent)
+    maxscript-mode-map)
   "Keymap used in Maxscript mode buffers.")
-
-(if (boundp 'maxscript-mode-map)
-    ()
-  (setq maxscript-mode-map (make-sparse-keymap))
-  ;(set-keymap-parent maxscript-mode-map c++-mode-map)
-  (define-key maxscript-mode-map ")" 'maxscript-mode-electric-insert-close-brace)
-  ;;  (define-key maxscript-mode-map "\C-c\C-d" 'maxscript-run-script)
-  )
 
 (defvar maxscript-indent-level 4 "The indentation level for Maxscript scripts.")
 
-(defconst maxscript-keywords
-  (eval-when-compile
-    (regexp-opt
-     '(
+(eval-and-compile
+  (defvar maxscript-keywords
+    '(
        "about" "and" "animate" "as" "at"
        "by"
        "case" "catch" "collect" "continue" "coordsys"
        "do"
        "else" "exit"
-       "fn" "for" "from" "function"
+       "fn" "for" "from" "function" "format"
        "global"
        "if" "in"
        "local"
        "macroscript" "mapped" "max"
        "not"
        "of" "off" "on" "or"
-       "parameters" "persistent" "plugin"
+       "parameters" "persistent" "plugin" "print"
        "rcmenu" "return" "rollout" "set" "struct"
        "then" "throw" "to" "tool" "try"
        "undo" "utility"
        "when" "where" "while" "with"
-       )))
-  "MAXScript keywords.")
+       )
+    "MAXScript keywords.")
 
-(defconst maxscript-constants
-  (eval-when-compile
-    (regexp-opt
-     '(
+  (defvar maxscript-constants
+    '(
        "true" "false"
        "on" "off"
        "pi" "e"
@@ -93,13 +88,11 @@
        "undefined"
        "unsupplied"
        "dontcollect"
-       )))
-  "MAXScript constants.")
+       )
+    "MAXScript constants.")
 
-(defconst maxscript-global-variables
-  (eval-when-compile
-    (regexp-opt
-     '(
+  (defvar maxscript-global-variables
+    '(
        "activeGrid" "ambientColor" "ambientColorController" "animationRange" "animButtonEnabled" "animButtonState" "autoBackup.enabled" "autoBackup.time"
        "backgroundColor" "backgroundColorController" "backgroundImageFileName"
        "cui.commandPanelOpen" "currentMaterialLibrary"
@@ -128,9 +121,13 @@
        "selectionSets" ;SelectionSetArray
        "currentMaterialLibrary" "sceneMaterials" "meditMaterials" ;MaterialLibrary
 
-       )))
-  "MAXScript global variables.")
+       )
+    "MAXScript global variables.")
+  ) ; eval-and-compile
 
+(eval-when-compile
+  (defun mxs-ppre (re)
+    (format "\\<\\(%s\\)\\>" (regexp-opt re))))
 
 (defconst maxscript-font-lock-keywords
   (list
@@ -138,12 +135,16 @@
      1 'font-lock-comment-face)
    '("\\(\"[^\"]*\"\\)"
      1 'font-lock-string-face)
-   `(eval .
-          (cons (concat "\\<\\(" ,maxscript-keywords "\\)\\>") 'font-lock-keyword-face))
-   `(eval .
-          (cons (concat "\\<\\(" ,maxscript-constants "\\)\\>") 'font-lock-constant-face))
-   `(eval .
-          (cons (concat "\\<\\(" ,maxscript-global-variables "\\)\\>") 'font-lock-variable-name-face))
+   (cons (eval-when-compile
+	   (mxs-ppre maxscript-keywords))
+	 font-lock-keyword-face)
+  (cons (eval-when-compile
+	  (mxs-ppre maxscript-constants))
+	font-lock-constant-face)
+  (cons (eval-when-compile
+	  (mxs-ppre maxscript-global-variables))
+	;font-lock-builtin-face)
+	font-lock-variable-name-face)
    ))
 
 
@@ -190,10 +191,9 @@
   )
 
 
-(defun maxscript-mode ()
+(define-derived-mode maxscript-mode c-mode "MXS"
   "Major mode for editing Maxscript script files."
-  (interactive)
-  ;(kill-all-local-variables)
+  
   (use-local-map maxscript-mode-map)
   (setq local-abbrev-table maxscript-mode-abbrev-table)
 
@@ -202,7 +202,10 @@
   (setq indent-tabs-mode t)
   (setq tab-width 4) ; a tab is 4 spaces wide
   (setq tab-stop-list '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60))
-  ;(local-set-key (kbd "C-m") 'newline-and-indent)
+
+  (set (make-local-variable 'comment-start) "-- ")
+  (set (make-local-variable 'comment-end) "")
+  (set (make-local-variable 'comment-padding) "")
 
   (setq font-lock-defaults
         '((maxscript-font-lock-keywords)
@@ -211,18 +214,9 @@
           ((?_ . "w") (?~ . "w"))
           nil
           ))
-
-  ;(setq mode-name (concat "MAXScript"))
-  (setq major-mode 'maxscript-mode)
-
   (run-hooks 'maxscript-mode-hook)
   )
 
-;; (defun maxscript-run-script ()
-;;   (interactive)
-;;   (let ((w32-start-process-show-window t))
-;;     (apply (function start-process)
-;;            "runscript.js" nil "wscript" (list "runscript.js" buffer-file-name)))
-;;   )
-
 (provide 'maxscript-mode)
+
+;;; maxscript-mode.el ends here
