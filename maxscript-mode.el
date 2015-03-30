@@ -135,6 +135,17 @@
      1 'font-lock-comment-face)
    '("\\(\"[^\"]*\"\\)"
      1 'font-lock-string-face)
+   ;; raw strings starting with @, highlight the @
+   '("\\(@\\)\""
+     1 'font-lock-emphasized-face)
+   '("\\(\\/\\*[a-z0-9 	\n]+?\\*\\/\\)"
+     1 'font-lock-comment-face)
+   '("\\(\\/\\*\\*\\*[a-z0-9 	\n]+?\\*\\*\\*\\/\\)"
+     1 'font-lock-doc-string-face)
+   '("\\(\\#\\sw+\\)"
+     1 'font-lock-preprocessor-face)
+   '("\\(\\$\\sw+\\)"
+     1 'font-lock-preprocessor-face)
    (cons (eval-when-compile
 	   (mxs-ppre maxscript-keywords))
 	 font-lock-keyword-face)
@@ -191,7 +202,7 @@
   )
 
 
-(define-derived-mode maxscript-mode c-mode "MXS"
+(define-derived-mode maxscript-mode prog-mode "MXS"
   "Major mode for editing Maxscript script files."
   
   (use-local-map maxscript-mode-map)
@@ -207,13 +218,10 @@
   (set (make-local-variable 'comment-end) "")
   (set (make-local-variable 'comment-padding) "")
 
-  (setq font-lock-defaults
-        '((maxscript-font-lock-keywords)
-          t
-          nil
-          ((?_ . "w") (?~ . "w"))
-          nil
-          ))
+  ;;(add-to-list 'align-c++-modes 'maxscript-mode)
+
+  (set (make-local-variable 'font-lock-defaults) '(maxscript-font-lock-keywords))
+  
   (run-hooks 'maxscript-mode-hook)
   )
 
