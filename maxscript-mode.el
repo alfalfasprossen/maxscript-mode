@@ -220,7 +220,7 @@
 
   ;;(add-to-list 'align-c++-modes 'maxscript-mode)
 
-  (set (make-local-variable 'font-lock-defaults) '(maxscript-font-lock-keywords))
+  (set (make-local-variable 'font-lock-defaults) '(maxscript-font-lock-keywords nil t))
   
   (run-hooks 'maxscript-mode-hook)
   )

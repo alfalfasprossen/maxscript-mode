@@ -54,3 +54,10 @@ floatvar = 1.2
 $object
 $object.name
 $bla*.name
+
+for obj in objects where obj.parent != undefined do(
+	return ok
+)
+
+UNDEFINED OK Undefined Ok
+struct STRUCT objects OBJECTS
