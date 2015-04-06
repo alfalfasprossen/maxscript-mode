@@ -18,17 +18,17 @@ To use it, put this in your init.el
  'maxscript-mode-hook
  (lambda ()
    (require 'send-to-max)
-   (local-set-key (kbd "C-m C-r") 'maxscript-send-region)
-   (local-set-key (kbd "C-m C-e") 'maxscript-send-buffer)
-   (local-set-key (kbd "C-m C-c") 'maxscript-send-buffer)
-   (local-set-key (kbd "C-m C-d") 'maxscript-clear-listener)))
+   (local-set-key (kbd "C-c C-r") 'maxscript-send-region)
+   (local-set-key (kbd "C-c C-e") 'maxscript-send-buffer)
+   (local-set-key (kbd "C-c C-c") 'maxscript-send-buffer)
+   (local-set-key (kbd "C-c C-d") 'maxscript-clear-listener)))
 
 (add-hook
  'python-mode-hook
  (lambda ()
    (require 'send-to-max)
-   (local-set-key (kbd "C-m C-r") 'maxscript-send-region-py)
-   (local-set-key (kbd "C-m C-e") 'maxscript-send-buffer-py)
-   (local-set-key (kbd "C-m C-c") 'maxscript-send-buffer-py)
-   (local-set-key (kbd "C-m C-d") 'maxscript-clear-listener)))
+   (local-set-key (kbd "C-c C-m C-r") 'maxscript-send-region-py)
+   (local-set-key (kbd "C-c C-m C-e") 'maxscript-send-buffer-py)
+   (local-set-key (kbd "C-c C-m C-c") 'maxscript-send-buffer-py)
+   (local-set-key (kbd "C-c C-m C-d") 'maxscript-clear-listener)))
 ```
