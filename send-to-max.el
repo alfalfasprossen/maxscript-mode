@@ -36,13 +36,15 @@
 ;; (defvar maxscript-buffer nil
 ;;   "Buffer used to display Maxscript output.")
 
+(defconst mxs-mode-base-dir (file-name-directory (or load-file-name buffer-file-name)))
+
 (defun maxscript-send-region (start end &optional aspython) 
   "Send region to Max."
   (interactive "r")
   (let ((content (buffer-substring-no-properties start end))
 	(result ()))
 	(setq result (shell-command-to-string
-		 (concat "python send-to-max.py " (if aspython "-py " "-ms ")
+		 (concat "python " mxs-mode-base-dir "/send-to-max.py " (if aspython "-py " "-ms ")
 			 (shell-quote-argument content))))
 	(print result)))
 
@@ -70,7 +72,7 @@
   "Clear the Maxscript-Listener outpu."
   (interactive)
   (let ((result (shell-command-to-string
-		 (concat "python send-to-max.py -c"))))
+		 (concat "python " mxs-mode-base-dir "/send-to-max.py -c"))))
 			 ;(shell-quote-argument "do stuff")))))
 	(print result)))
 
