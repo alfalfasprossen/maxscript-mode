@@ -147,7 +147,7 @@
      1 'font-lock-emphasized-face)
    ;;'("\\(\\/\\*[a-z0-9 	\n]+?\\*\\/\\)"
    ;;  1 'font-lock-comment-face)
-   '("\\(\\(\\/\\*\\*\\*\n\\(?:.\\|\n\\)+?\\*\\/\\)?\\)"
+   '("\\(\\(\\/\\*\\*\\*\\(?:.\\|\n\\)+?\\*\\/\\)?\\)"
      0 'font-lock-doc-string-face t) ;OVERRIDE
    ;; names starting with #
    '("\\(\\#\\sw+\\)"
@@ -260,6 +260,8 @@
   (modify-syntax-entry ?\n "> ")
   (modify-syntax-entry ?_ "w")
   (modify-syntax-entry ?: ".")
+  (modify-syntax-entry ?# "w")
+  (modify-syntax-entry ?$ "w")
   
   (run-hooks 'maxscript-mode-hook)
   )
