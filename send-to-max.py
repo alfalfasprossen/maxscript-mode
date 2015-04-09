@@ -2,26 +2,43 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import os
+import tempfile
 import ctypes #required for windows ui stuff
 import threading
 
-def executeMaxScript(code):
+def sendCmdToMax(cmd):
     if connect():
-        SendMessage(gMiniMacroRecorder, WM_SETTEXT, 0, code)
+        SendMessage(gMiniMacroRecorder, WM_SETTEXT, 0, cmd)
         SendMessage(gMiniMacroRecorder, WM_CHAR, VK_RETURN, 0)
         disconnect()
     else:
         print MAX_NOT_FOUND
 
-def executeMaxPython(code):
-    if connect():
-        # TODO write to temp file and execute by python.executfile
-        code = "python.execute \"%s\"" % code
-        SendMessage(gMiniMacroRecorder, WM_SETTEXT, 0, code)
-        SendMessage(gMiniMacroRecorder, WM_CHAR, VK_RETURN, 0)
-        disconnect()
+def executeFile(fpath):
+    name, ext = os.path.splitext(fpath)
+    if ext.lower() == ".ms":
+        cmd = 'fileIn (@"%s");' % fpath
+    elif ext.lower() == ".py":
+        cmd = 'python.executefile (@"%s");' % fpath
     else:
-        print MAX_NOT_FOUND
+        print "Unknown file extension: %s" % ext
+
+def writeTempFile(text, ext):
+    tmpdir = tempfile.gettempdir()
+    tmpfile = "sendtomaxtempfile" + ext
+    fpath = os.path.join(tmpdir, tmpfile)
+    with open(fpath, 'w') as f:
+        f.write(text)
+    return fpath
+
+def executeMaxScript(code):
+    fpath = writeTempFile(code, ".ms")
+    executeFile(fpath)
+
+def executeMaxPython(code):
+    fpath = writeTempFile(code, ".py")
+    executeFile(fpath)
 
 def clearListenerOutput():
     print "not implemented yet"
@@ -32,6 +49,8 @@ def executeThis():
             executeMaxScript(sys.argv[2])
         elif sys.argv[1] == "-py":
             executeMaxPython(sys.argv[2])
+        elif sys.argv[1] == "-f":
+            executeFile(sys.argv[2])
     elif len(sys.argv)>1:
         if sys.argv[1] == "-c":
             clearListenerOutput()
@@ -41,7 +60,7 @@ def executeThis():
 #
 
 MAX_TITLE_IDENTIFIER = r"Autodesk 3ds Max"
-MAX_NOT_FOUND = r"Could not find a 3ds max instance."
+MAX_NOT_FOUND = r"Could not find a 3ds Max instance."
 RECORDER_NOT_FOUND = r"Could not find MAXScript Macro Recorder"
 
 gMaxThreadProcessID = None # the UI-thread of 3DsMax
@@ -243,6 +262,5 @@ def connect():
 
 def disconnect():
     detachThreads()
-    pass
 
 executeThis()
