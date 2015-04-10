@@ -19,8 +19,10 @@ def executeFile(fpath):
     name, ext = os.path.splitext(fpath)
     if ext.lower() == ".ms":
         cmd = 'fileIn (@"%s");' % fpath
+        sendCmdToMax(cmd)
     elif ext.lower() == ".py":
         cmd = 'python.executefile (@"%s");' % fpath
+        sendCmdToMax(cmd)
     else:
         print "Unknown file extension: %s" % ext
 
