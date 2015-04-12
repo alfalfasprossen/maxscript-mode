@@ -46,6 +46,12 @@
 			  cmd)))
     (print result)))
 
+(defun maxscript-send-line-or-region ()
+  (interactive)
+  (if (use-region-p)
+      (maxscript-send-region region-beginning region-end)
+    (maxscript-send-region (point-at-bol) (point-at-eol))))
+
 (defun maxscript-send-region (start end &optional aspython) 
   "Send region to Max."
   (interactive "r")
