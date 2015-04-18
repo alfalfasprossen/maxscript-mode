@@ -9,9 +9,18 @@ import threading
 
 def sendCmdToMax(cmd):
     if connect():
-        SendMessage(gMiniMacroRecorder, WM_SETTEXT, 0, cmd)
+        SendMessage(gMiniMacroRecorder, WM_SETTEXT, 0, unicode(cmd))
         SendMessage(gMiniMacroRecorder, WM_CHAR, VK_RETURN, 0)
         disconnect()
+    else:
+        print MAX_NOT_FOUND
+
+def getRespFromMax():
+    if connect():
+        length = SendMessage(gLogWindow, WM_GETTEXTLENGTH, 0, 0)
+        buff = ctypes.create_unicode_buffer(length + 1)
+        SendMessage(gLogWindow, WM_GETTEXT, length+1, buff)
+        print buff.value
     else:
         print MAX_NOT_FOUND
 
@@ -62,12 +71,15 @@ def executeThis():
 #
 
 MAX_TITLE_IDENTIFIER = r"Autodesk 3ds Max"
+MAX_LISTENER_IDENTIFIER = r"MAXScript Listener"
 MAX_NOT_FOUND = r"Could not find a 3ds Max instance."
 RECORDER_NOT_FOUND = r"Could not find MAXScript Macro Recorder"
 
 gMaxThreadProcessID = None # the UI-thread of 3DsMax
 gMainWindow = None # the 3DsMax Window
 gMiniMacroRecorder = None
+gListenerWindow = None
+gLogWindow = None
 
 # windows functions and constants
 # stuff for finding and analyzing UI Elements
@@ -75,6 +87,7 @@ EnumWindows = ctypes.windll.user32.EnumWindows
 EnumWindowsProc = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int))
 EnumChildWindows = ctypes.windll.user32.EnumChildWindows
 FindWindowEx = ctypes.windll.user32.FindWindowExW
+EnumThreadWindows = ctypes.windll.user32.EnumThreadWindows
 
 GetClassName = ctypes.windll.user32.GetClassNameW
 GetWindowText = ctypes.windll.user32.GetWindowTextW
@@ -83,10 +96,12 @@ IsWindowVisible = ctypes.windll.user32.IsWindowVisible
 GetWindow = ctypes.windll.user32.GetWindow
 GetWindowThreadProcessId = ctypes.windll.user32.GetWindowThreadProcessId
 
-PostMessage = ctypes.windll.user32.PostMessageA
-SendMessage = ctypes.windll.user32.SendMessageA
+PostMessage = ctypes.windll.user32.PostMessageW
+SendMessage = ctypes.windll.user32.SendMessageW
 
 WM_SETTEXT = 0x000C
+WM_GETTEXT = 0x000D
+WM_GETTEXTLENGTH = 0x000E
 WM_KEYDOWN = 0x0100
 WM_KEYUP = 0x0101
 WM_CHAR = 0x0102 # the alternative to WM_KEYDOWN
@@ -235,9 +250,16 @@ def _getWindows(hwnd, lParam):
             
             # get the command line field
             gMiniMacroRecorder = getChildWindowByName(gMainWindow, name = None,
-                                                      cls = "MXS_Scintilla")
+                                                      cls = "MXS_Scintilla", instance = 1)
+            
             if gMiniMacroRecorder == null_ptr:
                 print RECORDER_NOT_FOUND
+                
+            maxThread = GetWindowThreadProcessId(hwnd, 0)
+            global gListenerWindow, gLogWindow
+            gListenerWindow = getChildWindowByName(maxThread, name = MAX_LISTENER_IDENTIFIER, cls=None, hwndIsThread=True)
+            gLogWindow = getChildWindowByName(gListenerWindow, name = None,
+                                                 cls = "MXS_Scintilla", instance = 1 )
             return False # we found Max, no further iteration required
     return True
 
