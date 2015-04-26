@@ -47,9 +47,13 @@ def clearListenerOutput():
 
 def executeThis():
     if len(sys.argv)>2:
+        # when receiving strings through the cmdline, we will have
+        # double backslashes and carriage returns, killing syntax.
         if sys.argv[1] == "-ms":
+            sys.argv[2] = sys.argv[2].replace("\\\\","\\").replace("\r","")
             executeMaxScript(sys.argv[2])
         elif sys.argv[1] == "-py":
+            sys.argv[2] = sys.argv[2].replace("\\\\","\\").replace("\r","")
             executeMaxPython(sys.argv[2])
         elif sys.argv[1] == "-f":
             executeFile(sys.argv[2])
