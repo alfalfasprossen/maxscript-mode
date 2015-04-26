@@ -52,7 +52,14 @@ def executeMaxPython(code):
     executeFile(fpath)
 
 def clearListenerOutput():
-    print "not implemented yet"
+    if connect():
+        SendMessage(gLogWindow, WM_KEYDOWN, VK_CTRL, 0)
+        SendMessage(gLogWindow, WM_KEYDOWN, VK_D, 0)
+        SendMessage(gLogWindow, WM_KEYUP, VK_CTRL, 0)
+        SendMessage(gLogWindow, WM_KEYUP, VK_D, 0)
+        disconnect()
+    else:
+        print MAX_NOT_FOUND
 
 def executeThis():
     if len(sys.argv)>2:
@@ -110,6 +117,9 @@ WM_KEYDOWN = 0x0100
 WM_KEYUP = 0x0101
 WM_CHAR = 0x0102 # the alternative to WM_KEYDOWN
 VK_RETURN  = 0x0D # Enter key
+
+VK_D = 0x44
+VK_CTRL = 0x11
 
 # attaching is required for SendMessage and the like to actually work like it should
 AttachThreadInput = ctypes.windll.user32.AttachThreadInput
