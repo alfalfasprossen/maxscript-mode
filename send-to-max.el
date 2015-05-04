@@ -8,7 +8,7 @@
 
 ;; -----------------------------------------------------------------------------
 ;; This file will only take care of passing the region/buffer content to a python
-;; script. See send-to-max.py
+;; script. See send_to_max.py
 ;; Inspired by etom.el and sublime3dsmax.
 ;;
 ;; How to use:
@@ -50,7 +50,7 @@
   "Send whatever pre-assembled command to the python script that will do the actual work."
   (let ((result ()))
     (setq result (shell-command-to-string
-		  (concat "python " maxscript/mode-base-dir "/send-to-max.py "
+		  (concat "python " maxscript/mode-base-dir "/send_to_max.py "
 			  cmd)))
     result))
 
