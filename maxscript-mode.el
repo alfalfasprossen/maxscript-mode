@@ -45,7 +45,7 @@
 
 (defvar maxscript-mode-map
   (let ((maxscript-mode-map (make-sparse-keymap)))
-    (define-key maxscript-mode-map ")" 'maxscript-mode-electric-insert-close-brace)
+    ;(define-key maxscript-mode-map ")" 'maxscript-mode-electric-insert-close-brace)
     (define-key maxscript-mode-map (kbd "C-m") 'newline-and-indent)
     maxscript-mode-map)
   "Keymap used in Maxscript mode buffers.")
