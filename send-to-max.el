@@ -33,20 +33,29 @@
 ;;
 ;; -----------------------------------------------------------------------------
 
-;; (defvar maxscript-buffer nil
-;;   "Buffer used to display Maxscript output.")
+(defconst maxscript/mode-base-dir (file-name-directory (or load-file-name buffer-file-name))
+  "Directory this file resides in, used to call the python script with an absolute path.")
 
-(defconst mxs-mode-base-dir (file-name-directory (or load-file-name buffer-file-name)))
+(defcustom maxscript-always-show-output t
+  "Show the maxscript output buffer whenever sending a command."
+  :type 'boolean
+  :group 'maxscript)
 
-(defun maxscript-send-command (cmd)
+(defcustom maxscript-always-clear-listener t
+  "Clear the listener output in 3dsMax before sending a new command. This will make sure we only append the output that is new to our output buffer."
+  :type 'boolean
+  :group 'maxscript)
+
+(defun maxscript/send-command (cmd)
   "Send whatever pre-assembled command to the python script that will do the actual work."
   (let ((result ()))
     (setq result (shell-command-to-string
-		  (concat "python " mxs-mode-base-dir "/send-to-max.py "
+		  (concat "python " maxscript/mode-base-dir "/send-to-max.py "
 			  cmd)))
-    (print result)))
+    result))
 
 (defun maxscript-send-line-or-region ()
+  "Send the line at point if no region, send region if exists."
   (interactive)
   (if (use-region-p)
       (maxscript-send-region (region-beginning) (region-end))
@@ -57,8 +66,11 @@
   (interactive "r")
   (let ((content (buffer-substring-no-properties start end))
 	(cmd ()))
+    (if maxscript-always-clear-listener (maxscript-clear-listener))
     (setq cmd (concat (if aspython "-py " "-ms ") (shell-quote-argument content)))
-    (maxscript-send-command cmd)))
+    (maxscript/send-command cmd)
+    (maxscript/fetch-output)
+    (if maxscript-always-show-output (maxscript-show-output-buffer))))
 
 (defun maxscript-send-region-py (start end)
   "Send region to Max as Python code."
@@ -80,15 +92,50 @@
   (interactive)
   (let ((cmd ()))
     (setq cmd (concat "-f " (buffer-file-name)))
-    (maxscript-send-command cmd)))
+    (maxscript/send-command cmd)))
+
+;;; maxscript listener output related functions
+(defvar maxscript/output-buffer "*mxs output*"
+  "Name of buffer used to display Maxscript output.")
+
+(defun maxscript/get-output-buffer ()
+  "Return the output buffer, create it if necessary. Also, set maxscript-mode there as major-mode."
+  (let ((buff (get-buffer-create maxscript/output-buffer)))
+	(with-current-buffer buff
+	  (maxscript-mode))
+    buff))
+
+(defun maxscript-show-output-buffer ()
+  (interactive)
+  (display-buffer (maxscript/get-output-buffer)))
+
+(defun maxscript-hide-output-buffer ()
+  (interactive)
+  (delete-windows-on (maxscript/get-output-buffer)))
+
+(defun maxscript-clear-output ()
+  "Clear the `maxscript/output-buffer' and the Maxscript-Listener in Max."
+  (interactive)
+  (with-current-buffer (get-buffer-create maxscript/output-buffer)
+      (erase-buffer)
+    )
+  (maxscript-clear-listener))
 
 (defun maxscript-clear-listener ()
-  "Clear the Maxscript-Listener outpu."
+  "Clear the Maxscript-Listener output in Max."
   (interactive)
-  (let ((result (shell-command-to-string
-		 (concat "python " mxs-mode-base-dir "/send-to-max.py -c"))))
-			 ;(shell-quote-argument "do stuff")))))
-	(print result)))
+  (let ((result (maxscript/send-command "-c")))
+    (princ result)))
+
+(defun maxscript/get-output ()
+  "Get the response (listener output) from Max."
+  (let ((result (maxscript/send-command "-g")))
+    result))
+
+(defun maxscript/fetch-output ()
+  "Write the output from Max into the output buffer."
+  (with-current-buffer (get-buffer-create maxscript/output-buffer)
+    (insert-before-markers (maxscript/get-output))))
 
 (provide 'send-to-max)
 
