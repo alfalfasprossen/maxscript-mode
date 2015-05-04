@@ -60,10 +60,10 @@ def executeMaxPython(code):
 
 def clearListenerOutput():
     if connect():
-        SendMessage(gLogWindow, WM_KEYDOWN, VK_CTRL, 0)
-        SendMessage(gLogWindow, WM_KEYDOWN, VK_D, 0)
-        SendMessage(gLogWindow, WM_KEYUP, VK_CTRL, 0)
-        SendMessage(gLogWindow, WM_KEYUP, VK_D, 0)
+        # Sending Ctrl+D as an isolated sequence, so that the current keyboard
+        # status doesn't interfere, would require extra functionality...
+        # Simpler: set the content of the window to and empty string instead ;)
+        SendMessage(gLogWindow, WM_SETTEXT, 0, unicode(""))
         disconnect()
     else:
         print MAX_NOT_FOUND
@@ -270,14 +270,14 @@ def _getWindows(hwnd, lParam):
             global gMainWindow, gMiniMacroRecorder
             gMainWindow = hwnd
             attachThreads(gMainWindow)
-            
+
             # get the command line field
             gMiniMacroRecorder = getChildWindowByName(gMainWindow, name = None,
                                                       cls = "MXS_Scintilla", instance = 1)
-            
+
             if gMiniMacroRecorder == null_ptr:
                 print RECORDER_NOT_FOUND
-                
+
             maxThread = GetWindowThreadProcessId(hwnd, 0)
             global gListenerWindow, gLogWindow
             gListenerWindow = getChildWindowByName(maxThread, name = MAX_LISTENER_IDENTIFIER, cls=None, hwndIsThread=True)
