@@ -51,8 +51,16 @@ def writeTempFile(text, ext):
     return fpath
 
 def executeMaxScript(code):
-    fpath = writeTempFile(code, ".ms")
-    executeFile(fpath)
+    """ Execute maxscript code by saving it to a temporary .ms file and
+    send a fileIn command to Max.
+    When only one line of code is present, execute it directly instead.
+    """
+    if "\n" in code:
+        fpath = writeTempFile(code, ".ms")
+        executeFile(fpath)
+    else:
+        cmd = code+";"
+        sendCmdToMax(cmd)
 
 def executeMaxPython(code):
     fpath = writeTempFile(code, ".py")
