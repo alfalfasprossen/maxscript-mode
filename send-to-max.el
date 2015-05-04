@@ -17,10 +17,10 @@
 ;;  'maxscript-mode-hook
 ;;  (lambda ()
 ;;    (require 'send-to-max)
-;;    (local-set-key (kbd "C-c C-r") 'maxscript-send-region)
-;;    (local-set-key (kbd "C-c C-e") 'maxscript-send-file)
+;;    (local-set-key [S-return] 'maxscript-send-line-or-region)
+;;    (local-set-key (kbd "C-e") 'maxscript-send-file)
 ;;    (local-set-key (kbd "C-c C-c") 'maxscript-send-buffer)
-;;    (local-set-key (kbd "C-c C-d") 'maxscript-clear-listener)))
+;;    (local-set-key (kbd "C-c C-d") 'maxscript-clear-output)))
 ;;
 ;; (add-hook
 ;;  'python-mode-hook
