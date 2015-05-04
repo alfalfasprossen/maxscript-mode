@@ -7,6 +7,13 @@ import tempfile
 import ctypes #required for windows ui stuff
 import threading
 
+def cleanCmdLineString(text):
+    """ remove any double backslashes and carriage returns
+    that may have beend added from the command line translation."""
+    text = text.replace("\\\\","\\")
+    text = text.replace("\r","")
+    return text
+
 def sendCmdToMax(cmd):
     if connect():
         SendMessage(gMiniMacroRecorder, WM_SETTEXT, 0, unicode(cmd))
@@ -15,12 +22,12 @@ def sendCmdToMax(cmd):
     else:
         print MAX_NOT_FOUND
 
-def getRespFromMax():
+def getOutputFromMax():
     if connect():
         length = SendMessage(gLogWindow, WM_GETTEXTLENGTH, 0, 0)
         buff = ctypes.create_unicode_buffer(length + 1)
         SendMessage(gLogWindow, WM_GETTEXT, length+1, buff)
-        print buff.value
+        print cleanCmdLineString(buff.value)
     else:
         print MAX_NOT_FOUND
 
@@ -66,16 +73,18 @@ def executeThis():
         # when receiving strings through the cmdline, we will have
         # double backslashes and carriage returns, killing syntax.
         if sys.argv[1] == "-ms":
-            sys.argv[2] = sys.argv[2].replace("\\\\","\\").replace("\r","")
-            executeMaxScript(sys.argv[2])
+            script = cleanCmdLineString(sys.argv[2])
+            executeMaxScript(script)
         elif sys.argv[1] == "-py":
-            sys.argv[2] = sys.argv[2].replace("\\\\","\\").replace("\r","")
-            executeMaxPython(sys.argv[2])
+            scritp = cleanCmdLineString(sys.argv[2])
+            executeMaxPython(script)
         elif sys.argv[1] == "-f":
             executeFile(sys.argv[2])
     elif len(sys.argv)>1:
         if sys.argv[1] == "-c":
             clearListenerOutput()
+        elif sys.argv[1] == "-g":
+            getOutputFromMax()
 
 
 # lots of code in here copied from our m2u-project
