@@ -252,6 +252,7 @@
 
   (setq mxs-font-lock-keywords maxscript-font-lock-keywords)
   (set (make-local-variable 'font-lock-defaults) '(mxs-font-lock-keywords nil t))
+  (set (make-local-variable 'comment-start) "--")
   
   (set-syntax-table (copy-syntax-table))
   (modify-syntax-entry ?- ". 12")
