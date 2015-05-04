@@ -47,6 +47,11 @@
   :type 'boolean
   :group 'maxscript)
 
+(defcustom maxscript-jump-lines t
+  "Move point to the next line each time a single line has been sent."
+  :type 'boolean
+  :group 'maxscript)
+
 (defun maxscript/send-command (cmd)
   "Send whatever pre-assembled command to the python script that will do the actual work."
   (let ((result ()))
@@ -60,7 +65,10 @@
   (interactive)
   (if (use-region-p)
       (maxscript-send-region (region-beginning) (region-end))
-    (maxscript-send-region (point-at-bol) (point-at-eol))))
+    (progn
+      (maxscript-send-region (point-at-bol) (point-at-eol))
+      (if maxscript-jump-lines
+	  (next-line)))))
 
 (defun maxscript-send-region (start end &optional aspython) 
   "Send region to Max."
@@ -136,7 +144,8 @@
 (defun maxscript/fetch-output ()
   "Write the output from Max into the output buffer."
   (with-current-buffer (get-buffer-create maxscript/output-buffer)
-    (insert-before-markers (maxscript/get-output))))
+    (insert-before-markers (maxscript/get-output))
+    (goto-char (point-max))))
 
 (provide 'send-to-max)
 
