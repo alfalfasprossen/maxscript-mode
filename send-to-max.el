@@ -32,6 +32,7 @@
 ;;    (local-set-key (kbd "C-c C-m C-d") 'maxscript-clear-listener)))
 ;;
 ;; -----------------------------------------------------------------------------
+(require 'maxscript-mode)
 
 (defconst maxscript/mode-base-dir (file-name-directory (or load-file-name buffer-file-name))
   "Directory this file resides in, used to call the python script with an absolute path.")
