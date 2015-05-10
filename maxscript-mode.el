@@ -127,19 +127,25 @@
   (defun mxs-ppre (re)
     (format "\\<\\(%s\\)\\>" (regexp-opt re))))
 
+(require 'compile)
+(defconst maxscript/error-pattern
+  "^--.*?: \\(.*\\); .*?: \\([0-9]+\\); .*?:: \\([0-9]+\\)$"
+  "Regexp that matches maxscript error reports.
+This is defined here because for simplicity sake I will do the highlighting of errors 
+in the regular font-lock way here in the mode-definition. I don't know how to handle
+overwriting highlighted text from compilation-minor-mode, probably would have to 
+un-highlight the specific parts first.")
+
+(defface maxscript-error-face '((t :inherit font-lock-comment-face :underline t))
+  "Face to highlight the filenames of compilation errors.")
+
 (defconst maxscript-font-lock-keywords
   (list
-   (cons (eval-when-compile
-	   (mxs-ppre maxscript-keywords))
-	 font-lock-keyword-face)
-   (cons (eval-when-compile
-	   (mxs-ppre maxscript-constants))
-	 font-lock-constant-face)
-   (cons (eval-when-compile
-	   (mxs-ppre maxscript-global-variables))
-	 font-lock-variable-name-face)
    '("\\(--.*$\\)"
      0 'font-lock-comment-face)
+   '("^--.*?: \\(.*\\); .*?: \\([0-9]+\\); .*?:: \\([0-9]+\\)$"
+   ;;(maxscript/error-pattern
+     1 'maxscript-error-face t) ;OVERRIDE
    '("\\(\"[^\"]*\"\\)"
      0 'font-lock-string-face)
    ;; raw strings starting with @, highlight the @
@@ -192,6 +198,16 @@
    ;; and unless it is the last arg in a function definition
    '("\\(\\sw+\\)\\([ 	]*=\\)"
      1 'font-lock-variable-name-face)
+   
+   (cons (eval-when-compile
+	   (mxs-ppre maxscript-keywords))
+	 font-lock-keyword-face)
+   (cons (eval-when-compile
+	   (mxs-ppre maxscript-constants))
+	 font-lock-constant-face)
+   (cons (eval-when-compile
+	   (mxs-ppre maxscript-global-variables))
+	 font-lock-variable-name-face)
    ))
 
 

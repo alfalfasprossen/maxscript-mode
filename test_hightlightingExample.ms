@@ -87,3 +87,14 @@ for obj in objects where obj.parent != undefined do(
 
 UNDEFINED OK Undefined Ok
 struct STRUCT objects OBJECTS
+
+-dude
+
+-- Fehler in Anonymer Codeblock; Dateiname: c:\Users\JB\AppData\Local\Temp\sendtomaxtempfile.ms; Position: 113; Zeile:: 7
+
+-- Syntaxfehler: bei ), erwartet <factor>
+--  In Zeile: )
+-- Fehler in Anonymer Codeblock; Dateiname: ; Position: 2; Zeile:: 1
+
+-- Syntaxfehler: bei ), erwartet <factor>
+--  In Zeile: )

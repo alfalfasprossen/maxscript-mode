@@ -111,7 +111,9 @@
   "Return the output buffer, create it if necessary. Also, set maxscript-mode there as major-mode."
   (let ((buff (get-buffer-create maxscript/output-buffer)))
 	(with-current-buffer buff
-	  (maxscript-mode))
+	  (maxscript-mode)
+	  (maxscript/setup-compile)
+	  (compilation-minor-mode))
     buff))
 
 (defun maxscript-show-output-buffer ()
@@ -146,6 +148,15 @@
   (with-current-buffer (get-buffer-create maxscript/output-buffer)
     (insert-before-markers (maxscript/get-output))
     (goto-char (point-max))))
+
+(require 'compile)
+(defun maxscript/setup-compile ()
+  (interactive)
+  (set (make-local-variable 'compilation-error-regexp-alist)
+       (list 'maxscript-compile-nogroup))
+  (set (make-local-variable 'compilation-error-regexp-alist-alist)
+       (list (cons 'maxscript-compile-nogroup
+		    (list maxscript/error-pattern 1 2)))))
 
 (provide 'send-to-max)
 
