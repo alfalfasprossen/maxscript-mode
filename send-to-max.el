@@ -147,7 +147,8 @@
   "Write the output from Max into the output buffer."
   (with-current-buffer (get-buffer-create maxscript/output-buffer)
     (insert-before-markers (maxscript/get-output))
-    (goto-char (point-max))))
+    (goto-char (point-max))
+    (compilation--ensure-parse (point-max))))
 
 (require 'compile)
 (defun maxscript/setup-compile ()
