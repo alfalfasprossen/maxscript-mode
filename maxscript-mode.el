@@ -129,7 +129,7 @@
 
 (require 'compile)
 (defconst maxscript/error-pattern
-  "^--.*?: \\(.*\\); .*?: \\([0-9]+\\); .*?:: \\([0-9]+\\)$"
+  "^--.*?: \\(.*\\); .*?: \\([0-9]+\\); .*?: \\([0-9]+\\)$"
   "Regexp that matches maxscript error reports.
 This is defined here because for simplicity sake I will do the highlighting of errors 
 in the regular font-lock way here in the mode-definition. I don't know how to handle
@@ -143,7 +143,7 @@ un-highlight the specific parts first.")
   (list
    '("\\(--.*$\\)"
      0 'font-lock-comment-face)
-   '("^--.*?: \\(.*\\); .*?: \\([0-9]+\\); .*?:: \\([0-9]+\\)$"
+   '("^--.*?: \\(.*\\); .*?: \\([0-9]+\\); .*?: \\([0-9]+\\)$"
    ;;(maxscript/error-pattern
      1 'maxscript-error-face t) ;OVERRIDE
    '("\\(\"[^\"]*\"\\)"

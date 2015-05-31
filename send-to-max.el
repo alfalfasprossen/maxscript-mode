@@ -101,7 +101,9 @@
   (interactive)
   (let ((cmd ()))
     (setq cmd (concat "-f " (buffer-file-name)))
-    (maxscript/send-command cmd)))
+    (maxscript/send-command cmd)
+    (maxscript/fetch-output)
+    (if maxscript-always-show-output (maxscript-show-output-buffer))))
 
 ;;; maxscript listener output related functions
 (defvar maxscript/output-buffer "*mxs output*"
