@@ -107,6 +107,15 @@ class ThreadWinLParm(ctypes.Structure):
         ("exact", ctypes.c_int) # match name (True) or string contains (False)
     ]
 
+def _matchingName( check, name, exact):
+    """ return True if the name matches check.
+    If not exact, returns True if check in name.
+    """
+    if exact:
+        return check == name
+    else:
+        return check in name
+    
 def _getChildWindowByName(hwnd, lParam):
     """callback function to be called by EnumChildWindows, see
     :func:`getChildWindowByName`
@@ -139,14 +148,15 @@ def _getChildWindowByName(hwnd, lParam):
                 return False
     elif param.cls == None and param.name != None:
         #print "no cls, but name"
-        if buff.value == param.name:
+        if _matchingName( param.name, buff.value, param.exact ):
             param._instance += 1
             if param.instance == 0 or param.instance == param._instance:
                 param.hwnd = hwnd
                 return False
     elif param.cls != None and param.name != None:
         #print "cls and name"
-        if buff.value == param.name and param.cls in cbuff.value:# == param.cls:
+        if (_matchingName( param.name, buff.value, param.exact)
+            and param.cls in cbuff.value):# == param.cls:
             if param.instance == 0 or param.instance == param._instance:
                 param.hwnd = hwnd
                 return False
