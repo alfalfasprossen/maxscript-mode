@@ -12,10 +12,10 @@ def get_window_by_title( title ):
 
 class Window():
     """ a windows window or element """
-    def __init__( hwnd ):
+    def __init__( self, hwnd ):
         self.hwnd = hwnd
 
-    def get_child_window( name = None, cls = None, exact = True, instance = 0,
+    def get_child_window( self, name = None, cls = None, exact = True, instance = 0,
                         loops = 1):
         """ Get a window or element that is somehow a child of this window.
         """
@@ -26,7 +26,7 @@ class Window():
             return Window(hwnd)
         return None
 
-    def get_thread_window( name = None, cls = None, exact = True, instance = 0,
+    def get_thread_window( self, name = None, cls = None, exact = True, instance = 0,
                            loops = 1):
         """ Get a window that is in the same thread like this window.
         """
@@ -38,22 +38,22 @@ class Window():
             return Window(hwnd)
         return None
 
-    def get_title():
+    def get_title(self):
         length = GetWindowTextLength(self.hwnd)
         buff = ctypes.create_unicode_buffer(length + 1)
         GetWindowText(self.hwnd, buff, length + 1)
         return buff.value
 
-    def get_text():
+    def get_text(self):
         length = SendMessage(self.hwnd, WM_GETTEXTLENGTH, 0, 0)
         buff = ctypes.create_unicode_buffer(length + 1)
         SendMessage(self.hwnd, WM_GETTEXT, length+1, buff)
         return buff.value
 
-    def set_text( text ):
+    def set_text(self, text ):
         SendMessage(self.hwnd, WM_SETTEXT, 0, unicode(text))
 
-    def send_return():
+    def send_return(self):
         SendMessage(self.hwnd, WM_CHAR, VK_RETURN, 0)
 
 null_ptr = ctypes.POINTER(ctypes.c_int)()

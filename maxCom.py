@@ -25,14 +25,14 @@ def _getMainWindow():
     return mw
 
 class MaxCommunicator():
-    def __init__(maxMainWindow):
+    def __init__(self, maxMainWindow):
         self.mainWindow = maxMainWindow
 
-        self.miniMacroRecorder = mainWindow.get_child_window(cls = MAX_SCINTILLA,
+        self.miniMacroRecorder = self.mainWindow.get_child_window(cls = MAX_SCINTILLA,
                                                              instance = 1)
         if not self.miniMacroRecorder:
             raise winCom.WindowNotFoundException(RECORDER_NOT_FOUND)
-        listenerWin = mainWindow.get_thread_window(name = MAX_LISTENER_IDENTIFIER)
+        listenerWin = self.mainWindow.get_thread_window(name = MAX_LISTENER_IDENTIFIER)
         self.logWindow = listenerWin.get_child_window(cls = MAX_SCINTILLA,
                                                       instance = 1)
         if not self.logWindow:
@@ -55,8 +55,8 @@ class MaxCommunicator():
         self.logWindow.set_text(unicode(""))
         self._disconnect()
 
-    def _connect():
+    def _connect(self):
         winCom.attachThreads( self.mainWindow.hwnd )
 
-    def _disconnect():
+    def _disconnect(self):
         winCom.detachThreads( self.mainWindow.hwnd )
