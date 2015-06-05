@@ -7,6 +7,8 @@ import tempfile
 
 import maxCom
 
+CMD_SUFFIX ="\r\n"
+
 def cleanCmdLineString(text):
     """ remove any double backslashes and carriage returns
     that may have beend added from the command line translation."""
@@ -25,10 +27,10 @@ def getOutputFromMax():
 def executeFile(fpath):
     name, ext = os.path.splitext(fpath)
     if ext.lower() == ".ms":
-        cmd = 'fileIn (@"%s");' % fpath
+        cmd = ('fileIn (@"%s")'+CMD_SUFFIX) % fpath
         sendCmdToMax(cmd)
     elif ext.lower() == ".py":
-        cmd = 'python.executefile (@"%s");' % fpath
+        cmd = ('python.executefile (@"%s")'+CMD_SUFFIX) % fpath
         sendCmdToMax(cmd)
     else:
         print "Unknown file extension: %s" % ext
@@ -50,7 +52,7 @@ def executeMaxScript(code):
         fpath = writeTempFile(code, ".ms")
         executeFile(fpath)
     else:
-        cmd = code+";"
+        cmd = code+CMD_SUFFIX
         sendCmdToMax(cmd)
 
 def executeMaxPython(code):
