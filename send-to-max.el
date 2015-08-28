@@ -70,6 +70,16 @@
       (if maxscript-jump-lines
 	  (next-line)))))
 
+(defun maxscript-send-line-or-region-py ()
+  "Send the line at point if no region, send region if exists."
+  (interactive)
+  (if (use-region-p)
+      (maxscript-send-region (region-beginning) (region-end) t)
+    (progn
+      (maxscript-send-region (point-at-bol) (point-at-eol) t)
+      (if maxscript-jump-lines
+	  (next-line)))))
+
 (defun maxscript-send-region (start end &optional aspython) 
   "Send region to Max."
   (interactive "r")
