@@ -71,7 +71,7 @@ def executeThis():
             script = cleanCmdLineString(sys.argv[2])
             executeMaxScript(script)
         elif sys.argv[1] == "-py":
-            scritp = cleanCmdLineString(sys.argv[2])
+            script = cleanCmdLineString(sys.argv[2])
             executeMaxPython(script)
         elif sys.argv[1] == "-f":
             executeFile(sys.argv[2])
