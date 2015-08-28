@@ -279,6 +279,7 @@ un-highlight the specific parts first.")
   (modify-syntax-entry ?: ".")
   (modify-syntax-entry ?# "w")
   (modify-syntax-entry ?$ "w")
+  (modify-syntax-entry ?+ ".")
   
   (run-hooks 'maxscript-mode-hook)
   )
