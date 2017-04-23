@@ -1,0 +1,62 @@
+* maxscript-mode
+
+Emacs mode for Autodesk 3dsMax's MAXScript and Python.
+
+=maxscript-mode= provides syntax highlighting (font-lock) for MAXScript and the functionality to send MAXScript and Python code to a running 3dsMax to be executed directly.
+
+The syntax highlighting is an expansion of [[https://github.com/akmrsk/maxscript-mode][maxscript-mode.el]] by Akihiko Morisaka. With the addition of =send-to-max=, =maxscript-mode= is generally an Emacs-equivalent to [[https://github.com/cb109/sublime3dsmax][Sublime 3ds Max]] by Christoph Bülter.
+
+** Installation
+Add maxscript-mode.el to your =load-path= and require or load it:
+
+#+begin_src emacs-lisp :tangle yes
+(add-to-list 'load-path "path/to/maxscript-mode/")
+(require 'maxscript-mode)
+#+end_src
+
+To automatically have maxscript-mode activated each time you load a .ms file:
+#+begin_src emacs-lisp :tangle yes
+(setq auto-mode-alist (append '(("\.ms$" . maxscript-mode)) auto-mode-alist))
+#+end_src
+
+=maxscript-mode= only defines the language syntax and editing functionality. The communication with 3dsMax is handled by =send-to-max=, which you will have to load, if you want to use these features.
+#+begin_src emacs-lisp :tangle yes
+(require 'send-to-max)
+#+end_src
+
+There are no default keybindings provided for these functions. The common ones would be like =C-c C-c= to send the buffer, as is used in many other modes. Another option is to use what you might be accustomed to from 3dsMax, using =S-<return>= to evaluate the selection or line and =C-e= to evaluate the actual file.
+
+#+begin_src emacs-lisp :tangle yes
+(add-hook
+ 'maxscript-mode-hook
+ (lambda ()
+   (local-set-key [S-return] 'maxscript-send-line-or-region)
+   (local-set-key (kbd "C-e") 'maxscript-send-file)
+   (local-set-key (kbd "C-c C-c") 'maxscript-send-buffer)
+   (local-set-key (kbd "C-c C-d") 'maxscript-clear-output)))
+
+(add-hook
+ 'python-mode-hook
+ (lambda ()
+   (local-set-key [S-return] 'maxscript-send-line-or-region-py)
+   (local-set-key (kbd "C-e") 'maxscript-send-file)))
+#+end_src
+
+Important: For =send-to-max= to work, Python must be available on your PATH.
+
+** Usage
+With the =send-to-max= features, you can send MAXScript or Python code directly to 3dsMax to be evaluated.
+
+[[./minidemo.gif]]
+
+=send-to-max= will use the first 3dsMax it can find and tell it to execute code by either running it from a temporarily saved file, or directly if it is only a single line of MAXScript code.
+
+There is a big difference between =maxscript-send-buffer= and =maxscript-send-file=. While the former will take the complete content of the buffer and write it into a temporary file, which is then =fileIn= loaded in MAXScript, the latter will =fileIn= the actual visited file of the buffer. This of course only works if the buffer visits a file on disk. Also note that unsaved changes are, of course, not reflected in the file on disk yet, so don't forget to save the buffer beforehand.
+Using =maxscript-send-file= makes sense if you have code referencing other files relative to the current file, like relative imports.
+
+The heavy work of sending the content is actually done by the python script =send_to_max.py=, not by the elisp functions.
+
+When sending something to 3dsMax, the result will be read back into a buffer called =*mxs output*=.
+Feedback from the evaluation in 3dsMax is only read directly after sending though. There is no constant parsing of the MAXScript Listener, because that would be slow. This means that statements inside loops or similar constructs will not be read back into the output buffer.
+
+Note: Python code will be executed in 3dsMax by calling =python.executefile=, which means this targets 3dsMax 2015 native python, not the Blur Python Bridge that you might use in older versions. I don't know if this needs to be changed for newer 3dsMax versions though. If you need to change it, you can find the responsible code in =send_to_max.py=.
